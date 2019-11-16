@@ -41,26 +41,12 @@ def pre_process_data(x_train: np.ndarray, x_test: np.ndarray):
 def main():
     train_batch = 3
     test_batch = 32
-    print('loading dataset...')
     ((x_train_np, y_train), (x_test_np, y_test)) = load_data()
-    print('pre-processing...')
     x_train, x_test = pre_process_data(x_train_np, x_test_np)
-
-    # train_inds = np.arange(x_train.shape[0])
-    # np.random.shuffle(train_inds)
-    # x_train = x_train[train_inds]
-    # y_train = y_train[train_inds]
-    #
-    # test_inds = np.arange(x_test.shape[0])
-    # np.random.shuffle(test_inds)
-    # x_test = x_test[test_inds]
-    # y_test = y_test[test_inds]
 
     train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(10000).batch(train_batch)
     test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(test_batch)
-    print('creating model...')
     model = CNNModel()
-    print('defining loss parameters and optimizer...')
     loss_function = tf.keras.losses.SparseCategoricalCrossentropy()
     optimizer = tf.keras.optimizers.Adam()
     training_loss = tf.keras.metrics.Mean(name='training_loss')
@@ -85,7 +71,6 @@ def main():
         test_loss(t_loss)
         test_accuracy(lbls, predictions)
 
-    print('starting...')
     x_axis = list()
     train_losses = list()
     train_accuracies = list()
@@ -122,21 +107,6 @@ def main():
     plt.plot(x_axis, test_accuracies)
 
     plt.show()
-
-    # epochs = 11  # since the dataset has 60000 examples divided into batches of 32, each epoch consists on ~1800 iterations, and thus 11 epochs are about 20000 iterations
-    # for epoch in range(epochs):
-    #     for images, labels in train_ds:
-    #         train_step(images, labels)
-    #
-    #     for test_images, test_labels in test_ds:
-    #         test_step(test_images, test_labels)
-    #
-    #     template = 'Epoch ' + '0' * (1 - epoch // 10) + str(epoch) + ', Loss: {}, Accuracy: {}%, Test Loss: {}, Test Accuracy: {}%\n'
-    #     print(template.format(training_loss.result(), training_accuracy.result() * 100, test_loss.result(), test_accuracy.result() * 100))
-    #     training_loss.reset_states()
-    #     training_accuracy.reset_states()
-    #     test_loss.reset_states()
-    #     test_accuracy.reset_states()
 
 
 if __name__ == '__main__':
