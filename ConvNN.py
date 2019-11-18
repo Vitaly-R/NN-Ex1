@@ -16,7 +16,7 @@ class CNNModel(tf.keras.Model):
         self.d1 = tf.keras.layers.Dense(1024, activation='relu')
         self.d2 = tf.keras.layers.Dense(10, activation='softmax')
 
-    def call(self, x):
+    def __call__(self, x):
         res = self.conv1(x)
         res = self.maxpool1(res)
         res = self.conv2(res)
@@ -24,6 +24,20 @@ class CNNModel(tf.keras.Model):
         res = self.flatten(res)
         res = self.d1(res)
         return self.d2(res)
+
+
+class ShallowCNN(tf.keras.Model):
+
+    def __init__(self):
+        super(ShallowCNN, self).__init__()
+        self.conv = tf.keras.layers.Conv2D(8, 3, activation='relu')
+        self.flatten = tf.keras.layers.Flatten()
+        self.dense = tf.keras.layers.Dense(10, activation='softmax')
+
+    def __call__(self, x):
+        res = self.conv(x)
+        res = self.flatten(res)
+        return self.dense(res)
 
 
 def load_data():
@@ -38,13 +52,22 @@ def pre_process_data(x_train: np.ndarray, x_test: np.ndarray):
     return x_train_p, x_test_p
 
 
-def main():
+def get_training_batches(x, y, batch_size, num_examples=-1):
+    if num_examples == -1:
+        return tf.data.Dataset.from_tensor_slices((x, y)).shuffle(10000).batch(batch_size)
+    else:
+        inds = np.arange(x.shape[0])
+        selected = inds[np.random.randint(0, inds.shape[0], num_examples)]
+        return tf.data.Dataset.from_tensor_slices((x[selected], y[selected])).shuffle(10000).batch(batch_size)
+
+
+def training_loop(num_training_examples, title):
     train_batch = 3
     test_batch = 32
     ((x_train_np, y_train), (x_test_np, y_test)) = load_data()
     x_train, x_test = pre_process_data(x_train_np, x_test_np)
 
-    train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(10000).batch(train_batch)
+    train_ds = get_training_batches(x_train, y_train, train_batch, num_training_examples)
     test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(test_batch)
     model = CNNModel()
     loss_function = tf.keras.losses.SparseCategoricalCrossentropy()
@@ -57,7 +80,7 @@ def main():
     @tf.function
     def train_step(imgs, lbls):
         with tf.GradientTape() as tape:
-            predictions = model.call(imgs)
+            predictions = model(imgs)
             loss = loss_function(lbls, predictions)
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -66,7 +89,7 @@ def main():
 
     @tf.function
     def test_step(imgs, lbls):
-        predictions = model.call(imgs)
+        predictions = model(imgs)
         t_loss = loss_function(lbls, predictions)
         test_loss(t_loss)
         test_accuracy(lbls, predictions)
@@ -90,22 +113,31 @@ def main():
             test_accuracies.append(test_accuracy.result())
         i += 1
 
+    print('final training loss', train_losses[-1])
+    print('final training accuracy', train_accuracies[-1])
+    print('final test loss', test_losses[-1])
+    print('final test accuracy', test_accuracies[-1])
+
     plt.figure()
-    plt.title('training loss values')
+    plt.title(title + '\ntraining loss values')
     plt.plot(x_axis, train_losses)
 
     plt.figure()
-    plt.title('training accuracy values')
+    plt.title(title + '\ntraining accuracy values')
     plt.plot(x_axis, train_accuracies)
 
     plt.figure()
-    plt.title('test loss values')
+    plt.title(title + '\ntest loss values')
     plt.plot(x_axis, test_losses)
 
     plt.figure()
-    plt.title('test accuracy values')
+    plt.title(title + '\ntest accuracy values')
     plt.plot(x_axis, test_accuracies)
 
+
+def main():
+    training_loop(60000, 'all examples')
+    training_loop(250, 'reduced number of examples')
     plt.show()
 
 
