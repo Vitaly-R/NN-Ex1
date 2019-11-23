@@ -16,7 +16,7 @@ class CNNModel(tf.keras.Model):
         self.d1 = tf.keras.layers.Dense(1024, activation='relu')
         self.d2 = tf.keras.layers.Dense(10, activation='softmax')
 
-    def __call__(self, x):
+    def __call__(self, x, **kwargs):
         res = self.conv1(x)
         res = self.maxpool1(res)
         res = self.conv2(res)
@@ -34,7 +34,7 @@ class ShallowCNN(tf.keras.Model):
         self.flatten = tf.keras.layers.Flatten()
         self.dense = tf.keras.layers.Dense(10, activation='softmax')
 
-    def __call__(self, x):
+    def __call__(self, x, **kwargs):
         res = self.conv(x)
         res = self.flatten(res)
         return self.dense(res)
