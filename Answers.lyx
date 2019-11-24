@@ -1,0 +1,336 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+Introduction to Neural Networks - Ex1
+\end_layout
+
+\begin_layout Paragraph
+1.
+ Train and Test 
+\begin_inset Newline newline
+\end_inset
+
+1.1 - Number of free parameters of the network.
+\end_layout
+
+\begin_layout Standard
+Input layer: 
+\begin_inset Formula $(batch,28,28,1)\rightarrow(batch,28,28,1)$
+\end_inset
+
+, Convolution layer 1: 
+\begin_inset Formula $(batch,28,28,1)\rightarrow(batch,24,24,32)$
+\end_inset
+
+ , Max pool layer 1: 
+\begin_inset Formula $(batch,24,24,32)\rightarrow(batch,12,12,32)$
+\end_inset
+
+, Convolution layer 2: 
+\begin_inset Formula $(batch,12,12,32)\rightarrow(batch,8,8,64)$
+\end_inset
+
+, Max pool layer 2: 
+\begin_inset Formula $(batch,8,8,64)\rightarrow(batch,4,4,64)$
+\end_inset
+
+, Flattening layer: 
+\begin_inset Formula $(batch,4,4,64)\rightarrow(batch,1024)$
+\end_inset
+
+, Dense layer 1: 
+\begin_inset Formula $(batch,1024)\rightarrow(batch,1024)$
+\end_inset
+
+, Dense layer 2: 
+\begin_inset Formula $(batch,1024)\rightarrow(batch,10)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Input layer parameters - 
+\begin_inset Formula $0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Convolution layer 1 parameters - There are 
+\begin_inset Formula $24*24$
+\end_inset
+
+ pixels in each image that are used as center for convolution, each filter
+ is of size 
+\begin_inset Formula $5*5$
+\end_inset
+
+ and there are 
+\begin_inset Formula $32$
+\end_inset
+
+ filters.
+ Combined, there are 
+\begin_inset Formula $24*24*5*5*32=460,000$
+\end_inset
+
+ parameters in the layer.
+\end_layout
+
+\begin_layout Standard
+Max pool layer 1 parameters - 0
+\end_layout
+
+\begin_layout Standard
+Convolution layer 2 parameters - There are 
+\begin_inset Formula $8*8$
+\end_inset
+
+ pixels in each image that are used as center for the convolution, each
+ pixel has 
+\begin_inset Formula $32$
+\end_inset
+
+ channels, and the window of each filter is 
+\begin_inset Formula $5*5$
+\end_inset
+
+, meaning the size of each filter is 
+\begin_inset Formula $5*5*32$
+\end_inset
+
+, and there are 64 filters.
+ Combined, there are 
+\begin_inset Formula $8*8*5*5*32*64=3,276,800$
+\end_inset
+
+ parameters in the layer.
+\end_layout
+
+\begin_layout Standard
+Max pool layer 2 parameters - 0
+\end_layout
+
+\begin_layout Standard
+Flattening layer parameters - 0
+\end_layout
+
+\begin_layout Standard
+Dense layer 1 parameters - There are 
+\begin_inset Formula $1024$
+\end_inset
+
+ neurons in the layer, each one with a bias and 
+\begin_inset Formula $1024$
+\end_inset
+
+ inputs.
+ Combined, there are 
+\begin_inset Formula $(1024+1)*1024=1,049,600$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+Dense layer 2 parameters - There are 
+\begin_inset Formula $10$
+\end_inset
+
+ neurons in the layer, each one with a bias and 
+\begin_inset Formula $1024$
+\end_inset
+
+ inputs.
+ Combined, there are 
+\begin_inset Formula $(1024+1)*10=10,250$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+Total number of parameters - 
+\begin_inset Formula $460,800+3,276,800+1,049,600+10,250=4,797,450$
+\end_inset
+
+ parameters in the network.
+\end_layout
+
+\begin_layout Paragraph
+1.1 - Training/Test accuracy plots:
+\end_layout
+
+\begin_layout Standard
+- plot...
+\end_layout
+
+\begin_layout Paragraph
+2.
+ Linear vs.
+ Non-Linear
+\end_layout
+
+\begin_layout Paragraph
+2.1 - Identifying non linear components and removing them
+\end_layout
+
+\begin_layout Standard
+- Removed ReLU activation functions.
+ 
+\end_layout
+
+\begin_layout Paragraph
+2.2 - Comparison of Results
+\end_layout
+
+\begin_layout Standard
+- ok...
+\end_layout
+
+\begin_layout Paragraph
+2.3 - Effect on Training and Final Test Accuracy
+\end_layout
+
+\begin_layout Standard
+- yes, very effect, much test, many accuracy
+\end_layout
+
+\begin_layout Paragraph
+3.
+ Deep vs, Shallow
+\end_layout
+
+\begin_layout Paragraph
+3.1 - Constructing a Shallow NN 
+\end_layout
+
+\begin_layout Standard
+3.1.1 - Number of Parameters
+\end_layout
+
+\begin_layout Standard
+3.1.2 - Plot of loss function (training + test, because not specified and
+ it's easy)
+\end_layout
+
+\begin_layout Paragraph
+3.2 - Reducing the Original Network
+\end_layout
+
+\begin_layout Standard
+3.2.1 - Number of parameters
+\end_layout
+
+\begin_layout Standard
+3.2.2 - plot of training loss and accuracy
+\end_layout
+
+\begin_layout Paragraph
+3.3 - Comparing Convergence
+\end_layout
+
+\begin_layout Standard
+- show plots and discuss how one converges faster or whatever...
+\end_layout
+
+\begin_layout Paragraph
+4.
+ Overfitting
+\end_layout
+
+\begin_layout Standard
+4.1 - plot training and test accuracies for the original network without
+ dropout on the original training set.
+\end_layout
+
+\begin_layout Standard
+plot training and test accuracies for the original network without dropout
+ on a reduced set of 250 examples.
+\end_layout
+
+\begin_layout Standard
+reduce size of network to reduce overfitting, or insert dropout layers to
+ the outputs of all hidden layers and report which probability resulted
+ in best results.
+\end_layout
+
+\end_body
+\end_document
