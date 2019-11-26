@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 from ConvNN import plot
 
 
-class DigitSumModel(tf.keras.Model):
+class ConcatenatedDigitSumModel(tf.keras.Model):
     def __init__(self):
-        super(DigitSumModel, self).__init__()
+        super(ConcatenatedDigitSumModel, self).__init__()
         self.conv1 = tf.keras.layers.Conv2D(32, 5, activation='relu')
         self.maxpool1 = tf.keras.layers.MaxPool2D(2)
         self.conv2 = tf.keras.layers.Conv2D(64, 5, activation='relu')
@@ -27,43 +27,86 @@ class DigitSumModel(tf.keras.Model):
         return self.dense3(res)
 
 
-def process_data(x, y):
-    inds1 = np.arange(x.shape[0])
-    inds2 = np.arange(x.shape[0])
-    np.random.shuffle(inds1)
-    np.random.shuffle(inds2)
-    xres1 = x[inds1]
-    yres1 = y[inds1]
-    xres2 = x[inds2]
-    yres2 = y[inds2]
-    xres = np.hstack((xres1, xres2))
+class SeparateDigitSumModel(tf.keras.Model):
+    def __init__(self):
+        super(SeparateDigitSumModel, self).__init__()
+        self.conv1_1 = tf.keras.layers.Conv2D(32, 5, activation='relu')
+        self.conv1_2 = tf.keras.layers.Conv2D(32, 5, activation='relu')
+        self.maxpool1_1 = tf.keras.layers.MaxPool2D(2)
+        self.maxpool1_2 = tf.keras.layers.MaxPool2D(2)
+        self.conv2_1 = tf.keras.layers.Conv2D(64, 5, activation='relu')
+        self.conv2_2 = tf.keras.layers.Conv2D(64, 5, activation='relu')
+        self.maxpool2_1 = tf.keras.layers.MaxPool2D(2)
+        self.maxpool2_2 = tf.keras.layers.MaxPool2D(2)
+        self.flatten_1 = tf.keras.layers.Flatten()
+        self.flatten_2 = tf.keras.layers.Flatten()
+        self.dense1_1 = tf.keras.layers.Dense(1024, activation='relu')
+        self.dense1_2 = tf.keras.layers.Dense(1024, activation='relu')
+        self.dense2_1 = tf.keras.layers.Dense(10, activation='relu')
+        self.dense2_2 = tf.keras.layers.Dense(10, activation='relu')
+        self.dense3 = tf.keras.layers.Dense(19, activation='softmax')
+
+    def __call__(self, x, **kwargs):
+        res1 = self.conv1_1(x[:, 0, ...])
+        res2 = self.conv1_2(x[:, 1, ...])
+        res1 = self.maxpool1_1(res1)
+        res2 = self.maxpool1_2(res2)
+        res1 = self.conv2_1(res1)
+        res2 = self.conv2_2(res2)
+        res1 = self.maxpool2_1(res1)
+        res2 = self.maxpool2_2(res2)
+        res1 = self.flatten_1(res1)
+        res2 = self.flatten_2(res2)
+        res1 = self.dense1_1(res1)
+        res2 = self.dense1_2(res2)
+        res1 = self.dense2_1(res1)
+        res2 = self.dense2_2(res2)
+        res = tf.keras.layers.concatenate([res1, res2])
+        return self.dense3(res)
+
+
+def process_data_separate(x, y):
+    inds = np.arange(x.shape[0])
+    np.random.shuffle(inds)
+    xres1 = x[inds]
+    yres1 = y[inds]
+    xres = np.array(list(zip(list(x), list(xres1))))
     xres = xres[..., np.newaxis]
     xres = xres / 255.0
-    yres = yres1 + yres2
+    yres = y + yres1
     return xres, yres
 
 
-def get_data(batch_size):
+def process_data_concatenated(x, y):
+    inds = np.arange(x.shape[0])
+    np.random.shuffle(inds)
+    xres1 = x[inds]
+    yres1 = y[inds]
+    xres = np.hstack((x, xres1))
+    xres = xres[..., np.newaxis]
+    xres = xres / 255.0
+    yres = y + yres1
+    return xres, yres
 
+
+def get_data(batch_size, concatenate=True):
     ((x_train_np, y_train), (x_test_np, y_test)) = tf.keras.datasets.mnist.load_data()
-    xtrain, ytrain = process_data(x_train_np, y_train)
-    xtest, ytest = process_data(x_test_np, y_test)
+    xtrain, ytrain = process_data_concatenated(x_train_np, y_train) if concatenate else process_data_separate(x_train_np, y_train)
+    xtest, ytest = process_data_concatenated(x_test_np, y_test) if concatenate else process_data_separate(x_test_np, y_test)
     train_ds = tf.data.Dataset.from_tensor_slices((xtrain, ytrain)).shuffle(10000).batch(batch_size)
     test_ds = tf.data.Dataset.from_tensor_slices((xtest, ytest)).batch(batch_size)
     return train_ds, test_ds
 
 
-def train_model(epochs=10, batch_size=30):
-    train_ds, test_ds = get_data(batch_size)
+def train_model(epochs=10, batch_size=30, concatenate=True):
+    train_ds, test_ds = get_data(batch_size, concatenate)
 
-    model = DigitSumModel()
+    model = ConcatenatedDigitSumModel() if concatenate else SeparateDigitSumModel()
 
     loss_function = tf.keras.losses.SparseCategoricalCrossentropy()
     optimizer = tf.keras.optimizers.Adam()
 
-    training_loss = tf.keras.metrics.Mean(name='training_loss')
     training_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='training_accuracy')
-    test_loss = tf.keras.metrics.Mean(name='test_loss')
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 
     @tf.function
@@ -73,21 +116,16 @@ def train_model(epochs=10, batch_size=30):
             loss = loss_function(lbls, predictions)
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-        training_loss(loss)
         training_accuracy(lbls, predictions)
 
     @tf.function
     def test_step(imgs, lbls):
         predictions = model(imgs)
-        t_loss = loss_function(lbls, predictions)
-        test_loss(t_loss)
         test_accuracy(lbls, predictions)
 
     i = 1
     x_axis = list()
-    train_losses = list()
     train_accuracies = list()
-    test_losses = list()
     test_accuracies = list()
     for epoch in range(1, epochs + 1):
         for x_batch, y_batch in train_ds:
@@ -97,22 +135,22 @@ def train_model(epochs=10, batch_size=30):
                 for test_images, test_labels in test_ds:
                     test_step(test_images, test_labels)
                 x_axis.append(i)
-                train_losses.append(training_loss.result())
                 train_accuracies.append(training_accuracy.result())
-                test_losses.append(test_loss.result())
                 test_accuracies.append(test_accuracy.result())
             i += 1
 
-    return x_axis, train_losses, train_accuracies, test_losses, test_accuracies
+    return x_axis, train_accuracies, test_accuracies
 
 
-def q_5():
-    x, train_losses, train_accuracies, test_losses, test_accuracies = train_model()
-    plot(x, train_losses, 'Training loss', '', '')
+def q_5_1():
+    x, train_accuracies, test_accuracies = train_model()
     plot(x, train_accuracies, 'Training accuracy', '', '')
-    plot(x, test_losses, 'Test loss', '', '')
     plot(x, test_accuracies, 'Test accuracy', '', '')
     plt.show()
 
 
-
+def q_5_2():
+    x, train_accuracies, test_accuracies = train_model(concatenate=False)
+    plot(x, train_accuracies, 'Training accuracy', '', '')
+    plot(x, test_accuracies, 'Test accuracy', '', '')
+    plt.show()
