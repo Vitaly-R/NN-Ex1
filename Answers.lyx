@@ -79,6 +79,14 @@
 Introduction to Neural Networks - Ex1
 \end_layout
 
+\begin_layout Standard
+Vitaly Rajev - 320929227
+\end_layout
+
+\begin_layout Section
+Practical Questions
+\end_layout
+
 \begin_layout Paragraph
 1.
  Train and Test 
@@ -330,6 +338,15 @@ plot training and test accuracies for the original network without dropout
 reduce size of network to reduce overfitting, or insert dropout layers to
  the outputs of all hidden layers and report which probability resulted
  in best results.
+\end_layout
+
+\begin_layout Paragraph
+5.
+ Two Digits Sum
+\end_layout
+
+\begin_layout Section
+Theoretical Questions
 \end_layout
 
 \end_body

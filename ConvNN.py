@@ -8,7 +8,7 @@ class CNNModel(tf.keras.Model):
 
     def __init__(self, conv1out=32, conv1window=5, conv1dropout=0.0, maxpool1dropout=0.0,
                  conv2out=64, conv2window=5, conv2dropout=0.0, maxpool2dropout=0.0,
-                 dense1out=1024, dense1dropout=0.0, hidden_activation: object='relu'):
+                 dense1out=1024, dense1dropout=0.0, hidden_activation: object = 'relu'):
         super(CNNModel, self).__init__()
         self.conv1 = tf.keras.layers.Conv2D(conv1out, conv1window, activation=hidden_activation)
         self.dropout1 = tf.keras.layers.Dropout(conv1dropout)
@@ -23,13 +23,23 @@ class CNNModel(tf.keras.Model):
         self.dropout5 = tf.keras.layers.Dropout(dense1dropout)
         self.d2 = tf.keras.layers.Dense(10, activation='softmax')
 
-    def __call__(self, x, **kwargs):
+    def __call__(self, x, training=True, **kwargs):
         res = self.conv1(x)
+        if training:
+            res = self.dropout1(res)
         res = self.maxpool1(res)
+        if training:
+            res = self.dropout2(res)
         res = self.conv2(res)
+        if training:
+            res = self.dropout3(res)
         res = self.maxpool2(res)
+        if training:
+            res = self.dropout4(res)
         res = self.flatten(res)
         res = self.d1(res)
+        if training:
+            res = self.dropout5(res)
         return self.d2(res)
 
 
@@ -37,7 +47,7 @@ class ShallowCNN(tf.keras.Model):
 
     def __init__(self):
         super(ShallowCNN, self).__init__()
-        self.conv = tf.keras.layers.Conv2D(8, 3, activation='relu')
+        self.conv = tf.keras.layers.Conv2D(3, 3, activation='relu')
         self.flatten = tf.keras.layers.Flatten()
         self.dense = tf.keras.layers.Dense(10, activation='softmax')
 
@@ -64,7 +74,7 @@ def get_training_batches(x, y, batch_size, num_examples=-1):
         return tf.data.Dataset.from_tensor_slices((x[selected], y[selected])).shuffle(10000).batch(batch_size)
 
 
-def train_model(model=CNNModel(), num_training_examples=60000):
+def train_model(model: tf.keras.Model = CNNModel(), num_training_examples=60000):
     train_batch = 32
     test_batch = 32
     iterations = 20000
@@ -79,6 +89,7 @@ def train_model(model=CNNModel(), num_training_examples=60000):
     optimizer = tf.keras.optimizers.Adam()
 
     training_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='training_accuracy')
+    training_loss = tf.keras.metrics.Mean(name='training_loss')
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 
     @tf.function
@@ -89,32 +100,35 @@ def train_model(model=CNNModel(), num_training_examples=60000):
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
         training_accuracy(lbls, predictions)
+        training_loss(loss)
 
     @tf.function
     def test_step(imgs, lbls):
-        predictions = model(imgs)
+        predictions = model(imgs, training=False)
         test_accuracy(lbls, predictions)
 
     x_axis = list()
     train_accuracies = list()
     test_accuracies = list()
+    training_losses = list()
     i = 1
 
     while i <= iterations:
         for x_batch, y_batch in train_ds:
             train_step(x_batch, y_batch)
             if not i % 500 or i == 1:
-                print('round', i)
                 for test_images, test_labels in test_ds:
                     test_step(test_images, test_labels)
                 x_axis.append(i)
                 train_accuracies.append(training_accuracy.result())
                 test_accuracies.append(test_accuracy.result())
+                training_losses.append(training_loss.result())
+                print('round', i, ', training accuracy:', train_accuracies[-1], ', test accuracy:', test_accuracies[-1])
             i += 1
             if i > iterations:
                 break
 
-    return x_axis, train_accuracies, test_accuracies
+    return x_axis, train_accuracies, test_accuracies, training_losses
 
 
 def plot(x, y, title='', xlabel='', ylabel=''):
@@ -123,31 +137,46 @@ def plot(x, y, title='', xlabel='', ylabel=''):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(x, y)
+    stitle = title.replace('\n', '')
+    plt.savefig('./Graphs/' + stitle + '.png')
 
 
 def q_1_2():
     model = CNNModel()
-    x, train_acc, test_acc = train_model(model)
-    plot(x, train_acc, 'Training Accuracy', 'round', 'accuracy')
-    plot(x, test_acc, 'Test Accuracy', 'round', 'accuracy')
+    x, train_acc, test_acc, _ = train_model(model)
+    plot(x, train_acc, 'Question 1.2 \nOriginal CNN \nTraining Accuracy', 'round', 'accuracy')
+    plot(x, test_acc, 'Question 1.2 \nOriginal CNN \nTest Accuracy', 'round', 'accuracy')
 
 
 def q_2_2():
     model = CNNModel(hidden_activation=None)
-    x, train_acc, test_acc = train_model(model)
-    plot(x, train_acc, 'Training Accuracy', 'round', 'accuracy')
-    plot(x, test_acc, 'Test Accuracy', 'round', 'accuracy')
+    x, train_acc, test_acc, _ = train_model(model)
+    plot(x, train_acc, 'Question 2.2 \nLinear Version of Original CNN \nTraining Accuracy', 'round', 'accuracy')
+    plot(x, test_acc, 'Question 2.2 \nLinear Version of Original CNN \nTest Accuracy', 'round', 'accuracy')
+
+
+def q_3_1():
+    model = ShallowCNN()
+    x, _, _, training_loss = train_model(model)
+    plot(x, training_loss, 'Question 3.1 \nShallow CNN \nTraining Loss', 'round', 'loss')
+
+
+def q_3_2():
+    model = CNNModel(conv1out=4, conv1window=3, conv2out=8, conv2window=3, dense1out=10)
+    x, training_accuracy, _, training_loss = train_model(model)
+    plot(x, training_accuracy, 'Question 3.2 \nReduced Original Network \nTraining Accuracy', 'round', 'accuracy')
+    plot(x, training_loss, 'Question 3.2 \nReduced Original Network \nTraining Loss', 'round', 'loss')
 
 
 def q_4_1():
     full = CNNModel()
-    full_x, full_train_acc, full_test_acc = train_model(full)
-    plot(full_x, full_train_acc, 'Original Network Training Accuracy', 'round', 'accuracy')
-    plot(full_x, full_test_acc, 'Original Network Test Accuracy', 'round', 'accuracy')
-    plot(full_x, [full_test_acc[i] / full_train_acc[i] for i in range(len(full_x))], 'Original Network Training to Test Accuracy Ratio', 'training round', 'accuracy')
+    full_x, full_train_acc, full_test_acc, _ = train_model(full)
+    plot(full_x, full_train_acc, 'Question 4.1 \nOriginal Network Training Accuracy', 'round', 'accuracy')
+    plot(full_x, full_test_acc, 'Question 4.1 \nOriginal Network Test Accuracy', 'round', 'accuracy')
+    plot(full_x, [full_test_acc[i] / full_train_acc[i] for i in range(len(full_x))], 'Question 4.1 \nOriginal Network Test to Training Accuracy Ratio', 'training round', 'accuracy')
 
     reduced = CNNModel(conv1dropout=0.2, maxpool1dropout=0.2, conv2dropout=0.2, maxpool2dropout=0.2, dense1dropout=0.2)
-    reduced_x, reduced_train_acc, reduced_test_acc = train_model(reduced)
-    plot(reduced_x, reduced_train_acc, 'Reduced Network Training Accuracy', 'round', 'accuracy')
-    plot(reduced_x, reduced_test_acc, 'Reduced Network Test Accuracy', 'round', 'accuracy')
-    plot(reduced_x, [reduced_test_acc[i] / reduced_train_acc[i] for i in range(len(reduced_x))], 'Reduced Network Test to Training Accuracy Ratio', 'training round', 'accuracy')
+    reduced_x, reduced_train_acc, reduced_test_acc, _ = train_model(reduced)
+    plot(reduced_x, reduced_train_acc, 'Question 4.1 \nReduced Network Training Accuracy', 'round', 'accuracy')
+    plot(reduced_x, reduced_test_acc, 'Question 4.1 \nReduced Network Test Accuracy', 'round', 'accuracy')
+    plot(reduced_x, [reduced_test_acc[i] / reduced_train_acc[i] for i in range(len(reduced_x))], 'Question 4.1 \nReduced Network Test to Training Accuracy Ratio', 'training round', 'accuracy')

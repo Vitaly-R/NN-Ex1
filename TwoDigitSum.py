@@ -42,8 +42,7 @@ class SeparateDigitSumModel(tf.keras.Model):
         self.flatten_2 = tf.keras.layers.Flatten()
         self.dense1_1 = tf.keras.layers.Dense(1024, activation='relu')
         self.dense1_2 = tf.keras.layers.Dense(1024, activation='relu')
-        self.dense2_1 = tf.keras.layers.Dense(10, activation='relu')
-        self.dense2_2 = tf.keras.layers.Dense(10, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1024, activation='relu')
         self.dense3 = tf.keras.layers.Dense(19, activation='softmax')
 
     def __call__(self, x, **kwargs):
@@ -59,9 +58,8 @@ class SeparateDigitSumModel(tf.keras.Model):
         res2 = self.flatten_2(res2)
         res1 = self.dense1_1(res1)
         res2 = self.dense1_2(res2)
-        res1 = self.dense2_1(res1)
-        res2 = self.dense2_2(res2)
         res = tf.keras.layers.concatenate([res1, res2])
+        res = self.dense2(res)
         return self.dense3(res)
 
 
@@ -131,12 +129,12 @@ def train_model(epochs=10, batch_size=30, concatenate=True):
         for x_batch, y_batch in train_ds:
             train_step(x_batch, y_batch)
             if not i % 500 or i == 1:
-                print('round', i)
                 for test_images, test_labels in test_ds:
                     test_step(test_images, test_labels)
                 x_axis.append(i)
                 train_accuracies.append(training_accuracy.result())
                 test_accuracies.append(test_accuracy.result())
+                print('round', i, 'training accuracy:', train_accuracies[-1], 'test accuracy:', test_accuracies[-1])
             i += 1
 
     return x_axis, train_accuracies, test_accuracies
@@ -144,13 +142,11 @@ def train_model(epochs=10, batch_size=30, concatenate=True):
 
 def q_5_1():
     x, train_accuracies, test_accuracies = train_model()
-    plot(x, train_accuracies, 'Training accuracy', '', '')
-    plot(x, test_accuracies, 'Test accuracy', '', '')
-    plt.show()
+    plot(x, train_accuracies, 'Question 5.1 \nDigits Sum Prediction as Concatenated Input \nTraining accuracy', 'round', 'accuracy')
+    plot(x, test_accuracies, 'Question 5.1 \nDigits Sum Prediction as Concatenated Input \nTest accuracy', 'round', 'accuracy')
 
 
 def q_5_2():
     x, train_accuracies, test_accuracies = train_model(concatenate=False)
-    plot(x, train_accuracies, 'Training accuracy', '', '')
-    plot(x, test_accuracies, 'Test accuracy', '', '')
-    plt.show()
+    plot(x, train_accuracies, 'Question 5.2 \nDigits Sum Prediction as Separate Inputs \nTraining accuracy', 'round', 'accuracy')
+    plot(x, test_accuracies, 'Question 5.2 \nDigits Sum Prediction as Separate Inputs \nTest accuracy', 'round', 'accuracy')
