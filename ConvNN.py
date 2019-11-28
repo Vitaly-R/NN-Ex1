@@ -123,7 +123,7 @@ def train_model(model: tf.keras.Model = CNNModel(), num_training_examples=60000)
                 train_accuracies.append(training_accuracy.result())
                 test_accuracies.append(test_accuracy.result())
                 training_losses.append(training_loss.result())
-                print('round', i, ', training accuracy:', train_accuracies[-1], ', test accuracy:', test_accuracies[-1])
+                print('round', i, ', training accuracy:', train_accuracies[-1].numpy(), ', training loss:', training_losses[-1].numpy(), ', test accuracy:', test_accuracies[-1].numpy())
             i += 1
             if i > iterations:
                 break
@@ -169,14 +169,28 @@ def q_3_2():
 
 
 def q_4_1():
-    full = CNNModel()
-    full_x, full_train_acc, full_test_acc, _ = train_model(full)
-    plot(full_x, full_train_acc, 'Question 4.1 \nOriginal Network Training Accuracy', 'round', 'accuracy')
-    plot(full_x, full_test_acc, 'Question 4.1 \nOriginal Network Test Accuracy', 'round', 'accuracy')
-    plot(full_x, [full_test_acc[i] / full_train_acc[i] for i in range(len(full_x))], 'Question 4.1 \nOriginal Network Test to Training Accuracy Ratio', 'training round', 'accuracy')
+    original = CNNModel()
+    full_x, full_train_acc, full_test_acc, _ = train_model(original)
+    plot(full_x, full_train_acc, 'Question 4.1 \nOriginal Network Without Dropout Training Accuracy \nFull Example Set', 'round', 'accuracy')
+    plot(full_x, full_test_acc, 'Question 4.1 \nOriginal Network Without Dropout Test Accuracy \nFull Example Set', 'round', 'accuracy')
+    plot(full_x, [full_test_acc[i] / full_train_acc[i] for i in range(len(full_x))],
+         'Question 4.1 \nOriginal Network Without Dropout Test to Training Accuracy Ratio \nFull Example Set', 'round', 'ratio')
+
+    reduced_x, reduced_train_acc, reduced_test_acc, _ = train_model(original, 250)
+    plot(reduced_x, reduced_train_acc, 'Question 4.1 \nOriginal Network Without Dropout Training Accuracy \nReduced Example Set', 'round', 'accuracy')
+    plot(reduced_x, reduced_test_acc, 'Question 4.1 \nOriginal Network Without Dropout Test Accuracy \nReduced Example Set', 'round', 'accuracy')
+    plot(reduced_x, [reduced_test_acc[i] / reduced_train_acc[i] for i in range(len(reduced_x))],
+         'Question 4.1 \nOriginal Network Without Dropout Test to Training Accuracy Ratio \nReduced Example Set', 'round', 'ratio')
 
     reduced = CNNModel(conv1dropout=0.2, maxpool1dropout=0.2, conv2dropout=0.2, maxpool2dropout=0.2, dense1dropout=0.2)
-    reduced_x, reduced_train_acc, reduced_test_acc, _ = train_model(reduced)
-    plot(reduced_x, reduced_train_acc, 'Question 4.1 \nReduced Network Training Accuracy', 'round', 'accuracy')
-    plot(reduced_x, reduced_test_acc, 'Question 4.1 \nReduced Network Test Accuracy', 'round', 'accuracy')
-    plot(reduced_x, [reduced_test_acc[i] / reduced_train_acc[i] for i in range(len(reduced_x))], 'Question 4.1 \nReduced Network Test to Training Accuracy Ratio', 'training round', 'accuracy')
+    full_x, full_train_acc, full_test_acc, _ = train_model(reduced)
+    plot(full_x, full_train_acc, 'Question 4.1 \nOriginal Network With Dropout Training Accuracy \nFull Example Set', 'round', 'accuracy')
+    plot(full_x, full_test_acc, 'Question 4.1 \nOriginal Network With Dropout Test Accuracy \nFull Example Set', 'round', 'accuracy')
+    plot(full_x, [full_test_acc[i] / full_train_acc[i] for i in range(len(full_x))],
+         'Question 4.1 \nOriginal Network With Dropout Test to Training Accuracy Ratio \nFull Example Set', 'round', 'ratio')
+
+    reduced_x, reduced_train_acc, reduced_test_acc, _ = train_model(reduced, 250)
+    plot(reduced_x, reduced_train_acc, 'Question 4.1 \nOriginal Network With Dropout Training Accuracy \nReduced Example Set', 'round', 'accuracy')
+    plot(reduced_x, reduced_test_acc, 'Question 4.1 \nOriginal Network With Dropout Test Accuracy \nReduced Example Set', 'round', 'accuracy')
+    plot(reduced_x, [reduced_test_acc[i] / reduced_train_acc[i] for i in range(len(reduced_x))],
+         'Question 4.1 \nOriginal Network With Dropout Test to Training Accuracy Ratio \nReduced Example Set', 'round', 'ratio')

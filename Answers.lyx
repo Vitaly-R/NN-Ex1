@@ -83,6 +83,10 @@ Introduction to Neural Networks - Ex1
 Vitaly Rajev - 320929227
 \end_layout
 
+\begin_layout Standard
+Sasha Tankov - 327337903
+\end_layout
+
 \begin_layout Section
 Practical Questions
 \end_layout
@@ -243,11 +247,37 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Paragraph
-1.1 - Training/Test accuracy plots:
+1.2 - Training/Test accuracy plots:
 \end_layout
 
 \begin_layout Standard
-- plot...
+(Final trainng accuracy - 99.4%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 1.2 Original CNN Training Accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 96.91%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 1.2 Original CNN Test Accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -261,8 +291,9 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-- Removed ReLU activation functions.
- 
+- The non-linear parts of the network are the ReLU activation functions
+ after each convolution, and the final softmax activation.
+ We removed the ReLU activations.
 \end_layout
 
 \begin_layout Paragraph
@@ -270,7 +301,37 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-- ok...
+The resulting accuracy measures:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 98.33%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 2.2 Linear Version of Original CNN Training Accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 95.18%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 2.2 Linear Version of Original CNN Test Accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -278,7 +339,8 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-- yes, very effect, much test, many accuracy
+The effect on the training and testing of the network is that after removing
+ the non-linear components, the accuracy measures dropped.
 \end_layout
 
 \begin_layout Paragraph
@@ -291,12 +353,71 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-3.1.1 - Number of Parameters
+3.1.1 - Number of Parameters:
 \end_layout
 
 \begin_layout Standard
-3.1.2 - Plot of loss function (training + test, because not specified and
- it's easy)
+In the convolution layer, each filter is with window size of 
+\begin_inset Formula $3*3$
+\end_inset
+
+ and there are 
+\begin_inset Formula $3$
+\end_inset
+
+ filters.
+ There are 26 pixels in the input image for which the convolution will be
+ calculated, each with 1 channel.
+ In total: 
+\begin_inset Formula $3*3*3*26*26*1=18,252$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+In the flattening layer there are 0 parameters, and the resulting vector
+ is of length 2,028
+\end_layout
+
+\begin_layout Standard
+In the dense layer there are 
+\begin_inset Formula $10$
+\end_inset
+
+ neurons, each one with 
+\begin_inset Formula $2,028$
+\end_inset
+
+ inputs and a bias.
+ In total: 
+\begin_inset Formula $(2,028+1)*10=20,290$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+In total, there are 
+\begin_inset Formula $18,252+20,290=38,542$
+\end_inset
+
+ parameters in the network.
+\end_layout
+
+\begin_layout Standard
+3.1.2 - Loss function of the training of the network:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 3.1 Shallow CNN Training Loss.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -304,11 +425,113 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-3.2.1 - Number of parameters
+3.2.1 - Number of parameters:
 \end_layout
 
 \begin_layout Standard
-3.2.2 - plot of training loss and accuracy
+In the first convolution layer, there are 4 filters, each with window size
+ of 
+\begin_inset Formula $3*3$
+\end_inset
+
+, and there are 
+\begin_inset Formula $26*26$
+\end_inset
+
+ pixels, each with 1 channel, over which the convolution will go.
+ In total: 
+\begin_inset Formula $4*3*3*1*26*26=24,336$
+\end_inset
+
+ parameters.
+ The shape of each resulting image is (26, 26, 4)
+\end_layout
+
+\begin_layout Standard
+In the first maxpool layer there are no parameters.
+ The shape of the resulting images is (13, 13, 4).
+\end_layout
+
+\begin_layout Standard
+In the second convolution layer, there are 8 filters, each with a 
+\begin_inset Formula $3*3$
+\end_inset
+
+ window, there are 
+\begin_inset Formula $11*11$
+\end_inset
+
+ pixels over which the convolution is calculated, each pixel with 4 input
+ channels.
+ In total: 
+\begin_inset Formula $11*11*4*8*3*3=34,848$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+In the second maxpool layer there are no parameters.
+ The shape of the resulting images is (5, 5, 8).
+\end_layout
+
+\begin_layout Standard
+In the flattening layer there are no parameters, and the resulting vector
+ is of length 200.
+\end_layout
+
+\begin_layout Standard
+In the first dense layer there are 10 neurons, each with a bias and 200
+ inputs.
+ In total: 
+\begin_inset Formula $(200+1)*10=2,010$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+In the second dense layer there are 10 neurons, each with 2,010 inputs and
+ a bias.
+ In total: 
+\begin_inset Formula $(2,010+1)*10=20,110$
+\end_inset
+
+ parameters.
+\end_layout
+
+\begin_layout Standard
+In total, there are 
+\begin_inset Formula $24,336+34,848+2,010+20,110=81,304$
+\end_inset
+
+ parameters in the network.
+\end_layout
+
+\begin_layout Standard
+3.2.2 - Training loss and accuracy of the network:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 3.2 Reduced Original Network Training Loss.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 3.2 Reduced Original Network Training Accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -316,7 +539,11 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-- show plots and discuss how one converges faster or whatever...
+From the plots of the loss of each network, we can see that the shallow
+ network converges faster (as there are less parameters to learn), and on
+ the other hand, from printing the loss and accuracy values in each round,
+ we got that the reduced original network converges to a lower training
+ loss, and to a higher test accuracy.
 \end_layout
 
 \begin_layout Paragraph
@@ -325,19 +552,205 @@ Total number of parameters -
 \end_layout
 
 \begin_layout Standard
-4.1 - plot training and test accuracies for the original network without
- dropout on the original training set.
+4.1 
 \end_layout
 
 \begin_layout Standard
-plot training and test accuracies for the original network without dropout
- on a reduced set of 250 examples.
+Plots of the original networks (no dropout) training accuracy, test accuracy,
+ and their ratio when training over all examples:
 \end_layout
 
 \begin_layout Standard
-reduce size of network to reduce overfitting, or insert dropout layers to
- the outputs of all hidden layers and report which probability resulted
- in best results.
+(Final tarining accuracy value - 99.4%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Training Accuracy Full Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy value - 96.77%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Test Accuracy Full Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final ratio - 0.9735)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Test to Training Accuracy Ratio Full Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plots of the original networks (no dropout) training accuracy, test accuracy,
+ and their ratio when training over a reduced set of 250 examples:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 100%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Training Accuracy Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 99.05%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Test Accuracy Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final ratio - 0.9905)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network Without Dropout Test to Training Accuracy Ratio Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plots of the reduced networks (with dropout) training accuracy, test accuracy,
+ and their ratio when training over all examples in the dataset:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 99.37%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Training Accuracy Full Example Set.png
+	lyxscale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 96.7%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Test Accuracy Full Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final ratio - 0.9731)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Test to Training Accuracy Ratio Full Example Set.png
+	lyxscale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Plots of the reduced networks (with dropout) training accuracy, test accuracy,
+ and their ratio when training over a reduced set of 250 examples:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 99.999%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Training Accuracy Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 99.04%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Test Accuracy Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final ratio - 0.9904)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 4.1 Original Network With Dropout Test to Training Accuracy Ratio Reduced Example Set.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -345,8 +758,202 @@ reduce size of network to reduce overfitting, or insert dropout layers to
  Two Digits Sum
 \end_layout
 
+\begin_layout Standard
+5.1 - Designed network architecture: 
+\end_layout
+
+\begin_layout Standard
+Convolution layer with 32 filters, each with a 
+\begin_inset Formula $5*5$
+\end_inset
+
+ window size, and a ReLU activation.
+\end_layout
+
+\begin_layout Standard
+Maxpool layer of 
+\begin_inset Formula $2*2$
+\end_inset
+
+ window.
+\end_layout
+
+\begin_layout Standard
+Convolution layer with 64 filters, each with a 
+\begin_inset Formula $5*5$
+\end_inset
+
+ window size, and a ReLU activation.
+\end_layout
+
+\begin_layout Standard
+Maxpool layer of 
+\begin_inset Formula $2*2$
+\end_inset
+
+ window.
+\end_layout
+
+\begin_layout Standard
+Flattening layer (result - vector of length 2,048).
+\end_layout
+
+\begin_layout Standard
+Dense layer 1 - with 2,048 neurons, and a ReLU activation.
+\end_layout
+
+\begin_layout Standard
+Dense layer 2 - with 20 neurons, and a ReLU activation.
+\end_layout
+
+\begin_layout Standard
+Dense layer 3 - with 19 neurons and a Softmax activation - output.
+\end_layout
+
+\begin_layout Standard
+5.1.1 - Plots of the training and test accuracies of the network:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 95.466%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 5.1 Digits Sum Prediction as Concatenated Input Training accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 92.648%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 5.1 Digits Sum Prediction as Concatenated Input Test accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+5.2 - Designed network architecture:
+\end_layout
+
+\begin_layout Standard
+Convolution layer with 32 filters, each with window size 
+\begin_inset Formula $5*5$
+\end_inset
+
+ and a ReLU activation, for each image.
+\end_layout
+
+\begin_layout Standard
+Maxpool layer of 
+\begin_inset Formula $2*2$
+\end_inset
+
+ window, for each image.
+\end_layout
+
+\begin_layout Standard
+Convolution layer with 64 filters, each with a 
+\begin_inset Formula $5*5$
+\end_inset
+
+ window size, and a ReLU activation, for each image.
+\end_layout
+
+\begin_layout Standard
+Maxpool layer of 
+\begin_inset Formula $2*2$
+\end_inset
+
+ window, for each image.
+\end_layout
+
+\begin_layout Standard
+Flattening layer for each image.
+\end_layout
+
+\begin_layout Standard
+Dense layer with 1024 neurons and a ReLU activation for each image.
+\end_layout
+
+\begin_layout Standard
+Dense layer with 1024 neurons and a ReLU activation, connected to both parts
+ of the previous dense layer (meaning, each neuron had 2,048 inputs).
+\end_layout
+
+\begin_layout Standard
+Dense layer with 19 neurons and a Softmax activation - output.
+\end_layout
+
+\begin_layout Standard
+5.2.1 - Plots of the training and test accuracies of the network:
+\end_layout
+
+\begin_layout Standard
+(Final training accuracy - 97.418%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 5.2 Digits Sum Prediction as Separate Inputs Training accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Final test accuracy - 95.178%)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename Graphs/Question 5.2 Digits Sum Prediction as Separate Inputs Test accuracy.png
+	lyxscale 70
+	scale 70
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+5.3 - Predicting each digit separately and then preforming the sum worked
+ better, since the network first predicted each number (up to the first
+ dense layer - since up to that point, it was identical to the original
+ network from question 1), and after concatenating the results of the prediction
+s, the second and third dense layers could calculate the sum.
+ On the other hand, the network with the concatenated input got two digits
+ in one image and was was trained to predict the sum, rather than to recognize
+ the digits, since it processed both numbers as a single input, it does
+ not distinguish between numbers.
+\end_layout
+
 \begin_layout Section
 Theoretical Questions
+\end_layout
+
+\begin_layout Paragraph
+1.
+ Convolution
+\end_layout
+
+\begin_layout Standard
+1.1.
 \end_layout
 
 \end_body
