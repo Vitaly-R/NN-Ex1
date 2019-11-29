@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 def main():
     # q_1_2()
-    # q_2_2()
+    q_2_2()
     # q_3_1()
     # q_3_2()
-    q_4_1()
+    # q_4_1()
     # q_5_1()
     # q_5_2()
     # plt.show()

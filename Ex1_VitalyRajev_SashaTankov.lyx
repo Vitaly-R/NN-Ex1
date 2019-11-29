@@ -29,9 +29,10 @@
 \bibtex_command default
 \index_command default
 \paperfontsize default
+\spacing single
 \use_hyperref false
 \papersize default
-\use_geometry false
+\use_geometry true
 \use_package amsmath 1
 \use_package amssymb 1
 \use_package cancel 1
@@ -44,6 +45,7 @@
 \use_package undertilde 1
 \cite_engine basic
 \cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
@@ -55,6 +57,10 @@
 \shortcut idx
 \color #008000
 \end_index
+\leftmargin 1cm
+\topmargin 2cm
+\rightmargin 1cm
+\bottommargin 1cm
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
@@ -76,6 +82,9 @@
 \begin_body
 
 \begin_layout Standard
+
+\series bold
+\bar under
 Introduction to Neural Networks - Ex1
 \end_layout
 
@@ -98,6 +107,10 @@ Practical Questions
 \end_inset
 
 1.1 - Number of free parameters of the network.
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -246,8 +259,19 @@ Total number of parameters -
  parameters in the network.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Paragraph
 1.2 - Training/Test accuracy plots:
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -280,6 +304,13 @@ Total number of parameters -
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Paragraph
 2.
  Linear vs.
@@ -292,8 +323,15 @@ Total number of parameters -
 
 \begin_layout Standard
 - The non-linear parts of the network are the ReLU activation functions
- after each convolution, and the final softmax activation.
- We removed the ReLU activations.
+ after each convolution, the Maxpool operations, and the final softmax activatio
+n.
+ The ReLU activations and Maxpool layers were removed.
+\end_layout
+
+\begin_layout Standard
+This was done by passing None as the activation of the hidden layers, and
+ by setting the Maxpool layers to be None when getting 1 as a parameter
+ (thus, cancelling the layer).
 \end_layout
 
 \begin_layout Paragraph
@@ -305,7 +343,7 @@ The resulting accuracy measures:
 \end_layout
 
 \begin_layout Standard
-(Final training accuracy - 98.33%)
+(Final training accuracy - 90.13%)
 \end_layout
 
 \begin_layout Standard
@@ -320,7 +358,7 @@ The resulting accuracy measures:
 \end_layout
 
 \begin_layout Standard
-(Final test accuracy - 95.18%)
+(Final test accuracy - 87.49%)
 \end_layout
 
 \begin_layout Standard
@@ -340,7 +378,17 @@ The resulting accuracy measures:
 
 \begin_layout Standard
 The effect on the training and testing of the network is that after removing
- the non-linear components, the accuracy measures dropped.
+ the non-linear components, the training and test accuracies dropped.
+ This is due to the network being strictly linear (except for the softmax
+ activation), and the digit recognition task not being linear, thus limiting
+ the networks ability to learn as effectively.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -509,6 +557,13 @@ In total, there are
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 3.2.2 - Training loss and accuracy of the network:
 \end_layout
 
@@ -544,6 +599,13 @@ From the plots of the loss of each network, we can see that the shallow
  the other hand, from printing the loss and accuracy values in each round,
  we got that the reduced original network converges to a lower training
  loss, and to a higher test accuracy.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Paragraph
@@ -591,6 +653,13 @@ Plots of the original networks (no dropout) training accuracy, test accuracy,
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 (Final ratio - 0.9735)
 \end_layout
 
@@ -600,6 +669,13 @@ Plots of the original networks (no dropout) training accuracy, test accuracy,
 	lyxscale 70
 	scale 70
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
 \end_inset
 
 
@@ -641,6 +717,13 @@ Plots of the original networks (no dropout) training accuracy, test accuracy,
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 (Final ratio - 0.9905)
 \end_layout
 
@@ -650,6 +733,13 @@ Plots of the original networks (no dropout) training accuracy, test accuracy,
 	lyxscale 70
 	scale 70
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
 \end_inset
 
 
@@ -668,6 +758,7 @@ Plots of the reduced networks (with dropout) training accuracy, test accuracy,
 \begin_inset Graphics
 	filename Graphs/Question 4.1 Original Network With Dropout Training Accuracy Full Example Set.png
 	lyxscale 70
+	scale 70
 
 \end_inset
 
@@ -690,6 +781,13 @@ Plots of the reduced networks (with dropout) training accuracy, test accuracy,
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 (Final ratio - 0.9731)
 \end_layout
 
@@ -697,7 +795,15 @@ Plots of the reduced networks (with dropout) training accuracy, test accuracy,
 \begin_inset Graphics
 	filename Graphs/Question 4.1 Original Network With Dropout Test to Training Accuracy Ratio Full Example Set.png
 	lyxscale 70
+	scale 70
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
 \end_inset
 
 
@@ -739,6 +845,13 @@ Plots of the reduced networks (with dropout) training accuracy, test accuracy,
 \end_layout
 
 \begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 (Final ratio - 0.9904)
 \end_layout
 
@@ -748,6 +861,13 @@ Plots of the reduced networks (with dropout) training accuracy, test accuracy,
 	lyxscale 70
 	scale 70
 
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
 \end_inset
 
 
@@ -943,6 +1063,13 @@ s, the second and third dense layers could calculate the sum.
  not distinguish between numbers.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Theoretical Questions
 \end_layout
@@ -950,6 +1077,10 @@ Theoretical Questions
 \begin_layout Paragraph
 1.
  Convolution
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -970,6 +1101,9 @@ By definition of convolution:
 \end_inset
 
 , we get that 
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula $(f(k+t)*g(k))(n)=\sum_{k=-\infty}^{\infty}f(t+(n-k))g(k)=_{(*)}\sum_{k=-\infty}^{\infty}f((n+t)-k)g(k)=_{(definition-convolution)}(f(k)*g(k))(n+t)$
 \end_inset
 
@@ -994,7 +1128,7 @@ By commutativity of convolution:
 
 \begin_layout Standard
 Therefore, we conclude that 
-\begin_inset Formula $(f(k)*g(k))(n)=(f(k)*g(k))(n+t)=(f(k)*g(k+t))(n)$
+\begin_inset Formula $(f(k+t)*g(k))(n)=(f(k)*g(k))(n+t)=(f(k)*g(k+t))(n)$
 \end_inset
 
 , and get that convolution is translation-invariant.
@@ -1095,6 +1229,10 @@ As seen in the previous question - the kength of the output signal is
 \begin_layout Paragraph
 2.
  ReLU
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1102,7 +1240,7 @@ As seen in the previous question - the kength of the output signal is
 \end_layout
 
 \begin_layout Standard
-given the function 
+Given the function 
 \begin_inset Formula $F(relu(f*l+b))$
 \end_inset
 
@@ -1111,7 +1249,7 @@ given the function
 \end_inset
 
  .
- since convolution is a linear operator, we have that 
+ Since convolution is a linear operator, we have that 
 \begin_inset Formula $\frac{\partial(f*l+b)}{\partial f}=l$
 \end_inset
 
@@ -1168,6 +1306,10 @@ So, the gradient descent algorithm will have no effect on this layer, and
 \begin_layout Paragraph
 3.
  Backpropagation
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1201,6 +1343,9 @@ It can be expressed in matrix form as
 \end_inset
 
  is a row vector in form of 
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula $x_{i}=(0,0,...,a_{1,1},...,a_{1,n},0,..,0,a_{2,1},....,a_{2,n},0,...,0,...,a_{n,1},...,a_{n,n},0,..,0)$
 \end_inset
 
@@ -1213,7 +1358,11 @@ It can be expressed in matrix form as
 \end_inset
 
 .
- So if the operation is linear then the derivative w.r.t 
+ 
+\end_layout
+
+\begin_layout Standard
+So if the operation is linear then the derivative w.r.t 
 \begin_inset Formula $f$
 \end_inset
 
@@ -1271,10 +1420,21 @@ The product
 , it is more efficient than a regular matrix-vector multiplication.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Paragraph
 4.
  Parameters vs.
  Constraints
+\begin_inset Newline newline
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

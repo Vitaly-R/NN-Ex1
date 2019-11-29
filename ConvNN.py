@@ -8,15 +8,15 @@ class CNNModel(tf.keras.Model):
 
     def __init__(self, conv1out=32, conv1window=5, conv1dropout=0.0, maxpool1dropout=0.0,
                  conv2out=64, conv2window=5, conv2dropout=0.0, maxpool2dropout=0.0,
-                 dense1out=1024, dense1dropout=0.0, hidden_activation: object = 'relu'):
+                 dense1out=1024, dense1dropout=0.0, hidden_activation: object = 'relu', pool_size=2):
         super(CNNModel, self).__init__()
         self.conv1 = tf.keras.layers.Conv2D(conv1out, conv1window, activation=hidden_activation)
         self.dropout1 = tf.keras.layers.Dropout(conv1dropout)
-        self.maxpool1 = tf.keras.layers.MaxPool2D(2)
+        self.maxpool1 = tf.keras.layers.MaxPool2D(pool_size) if pool_size > 1 else None
         self.dropout2 = tf.keras.layers.Dropout(maxpool1dropout)
         self.conv2 = tf.keras.layers.Conv2D(conv2out, conv2window, activation=hidden_activation)
         self.dropout3 = tf.keras.layers.Dropout(conv2dropout)
-        self.maxpool2 = tf.keras.layers.MaxPool2D(2)
+        self.maxpool2 = tf.keras.layers.MaxPool2D(pool_size) if pool_size > 1 else None
         self.dropout4 = tf.keras.layers.Dropout(maxpool2dropout)
         self.flatten = tf.keras.layers.Flatten()
         self.d1 = tf.keras.layers.Dense(dense1out, activation=hidden_activation)
@@ -27,13 +27,13 @@ class CNNModel(tf.keras.Model):
         res = self.conv1(x)
         if training:
             res = self.dropout1(res)
-        res = self.maxpool1(res)
+        res = self.maxpool1(res) if self.maxpool1 is not None else res
         if training:
             res = self.dropout2(res)
         res = self.conv2(res)
         if training:
             res = self.dropout3(res)
-        res = self.maxpool2(res)
+        res = self.maxpool2(res) if self.maxpool1 is not None else res
         if training:
             res = self.dropout4(res)
         res = self.flatten(res)
@@ -149,7 +149,7 @@ def q_1_2():
 
 
 def q_2_2():
-    model = CNNModel(hidden_activation=None)
+    model = CNNModel(hidden_activation=None, pool_size=1)
     x, train_acc, test_acc, _ = train_model(model)
     plot(x, train_acc, 'Question 2.2 \nLinear Version of Original CNN \nTraining Accuracy', 'round', 'accuracy')
     plot(x, test_acc, 'Question 2.2 \nLinear Version of Original CNN \nTest Accuracy', 'round', 'accuracy')
