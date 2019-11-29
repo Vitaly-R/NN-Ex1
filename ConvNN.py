@@ -137,8 +137,6 @@ def plot(x, y, title='', xlabel='', ylabel=''):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(x, y)
-    stitle = title.replace('\n', '')
-    plt.savefig('./Graphs/' + stitle + '.png')
 
 
 def q_1_2():
